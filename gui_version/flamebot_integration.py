@@ -62,9 +62,9 @@ def run_flamebot(logs,flame_lang,flame_output_path):
     # Start the flamebot(Jesus takes the wheel from here), also change working directory accordingly!!
     osname = platform.system()
     if osname == "Windows": 
+        bill_gates_special()
         flameoutput = subprocess.run(["python","src/main.py"],cwd="LogFC/LogFC-main", capture_output=True, text=True)
     else:
-        bill_gates_special()
         flameoutput = subprocess.run(["python3", "src/main.py"],cwd="LogFC/LogFC-main",capture_output=True,text=True)
     
     print(flameoutput.stdout)
