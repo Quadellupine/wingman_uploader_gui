@@ -53,9 +53,9 @@ def run_flamebot(logs,flame_lang,flame_output_path):
     
     flame_lang = '"'+flame_lang+'"'
     change_language(flame_lang)
-    os.remove("LogFC/LogFC-main/src/input logs.txt")
+    os.remove("LogFC/LogFC-main/src/input_logs.txt")
     # Write the passed files into the required text file
-    with open("LogFC/LogFC-main/src/input logs.txt", "w") as file:
+    with open("LogFC/LogFC-main/src/input_logs.txt", "w") as file:
         for log in logs:
             file.write(log+"\n")
         file.close()
@@ -68,6 +68,7 @@ def run_flamebot(logs,flame_lang,flame_output_path):
         flameoutput = subprocess.run(["python3", "src/main.py"],cwd="LogFC/LogFC-main",capture_output=True,text=True)
     
     print(flameoutput.stdout)
+    print(flameoutput.stderr)
     outfile = flame_output_path+"/output.txt"
     with open(outfile, 'w', encoding='utf-8') as file:
         file.write(flameoutput.stdout)
