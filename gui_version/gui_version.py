@@ -172,7 +172,7 @@ def upload(log, wingman, retry_count):
 
 
 def is_shitlog(dps_link):
-    shitlogs = ["_trio", "_tc", "_esc", "_bk", "_eyes", "_se", "_rr"]
+    shitlogs = ["_trio", "_tc", "_esc", "_bk", "_eyes", "_se", "_rr", "_race"]
     for substring in shitlogs:
         if substring in dps_link:
             return True
