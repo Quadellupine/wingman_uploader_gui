@@ -60,7 +60,7 @@ If you CLOSE to batchupload window the uploading will continue in the background
 A project by Vs Brizeh: https://github.com/Brizeh/LogFC
 In short: Give it a bunch of logs and it will flame. Clicking on the "Brizeh's Flamebot" button will download his code onto your computer and then attempt to execute it with the logs you pasted into the text field.<br>
 Recommended usage: Use the Copy All Button in the main Window after your Fullclear and paste it into the popup.<br><br>
-The flamebot will output the result into the terminal and textfile called output.txt. By default, this file is generate in the gui_version subfolder. You can set a different path in the config.ini if you like. Rerunning the flamebot will overwrite the previous contents of output.txt. <br>
+The flamebot will output the result into the terminal and textfile called output.txt. By default, this file is generated in the gui_version subfolder. You can set a different path in the config.ini if you like. Rerunning the flamebot will overwrite the previous contents of output.txt. <br>
 Please report issues with this, as Brizeh's Code sometimes changes which in turn may cause issues with this integration. I will try to fix it asap.
 # Some tips
 1. I usually place this window on a seperate workspace. On windows, you can access this feature using
