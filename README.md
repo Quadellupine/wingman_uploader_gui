@@ -15,7 +15,7 @@ Because this project depends on Elite Insights, which in turn now depends on the
 Unfortunately, I dont know how to create an executable for windows that does not instantly get swatted by Windows Defender. Open to suggestions though!
 
 **Option 2:**
-1. Install Python 3.12 via winget```winget install --id=Python.Python.3.12  -e```or download it here: https://www.python.org/ftp/python/3.12.7/python-3.12.7-amd64.exe
+1. Install Python 3.12 via winget```winget install --id=Python.Python.3.12  -e```or download it here: https://www.python.org/ftp/python/3.12.7/python-3.12.7-amd64.exe. Make sure to click the checkbox "Add to PATH".
 2. Optional: Create a virtual envrionment (https://realpython.com/python-virtual-environments-a-primer/)
 3. Download this code by clicking on "Code" at the top right and then: Download Zip
 4. Extract the contents to a folder of your choosing
@@ -24,7 +24,7 @@ Unfortunately, I dont know how to create an executable for windows that does not
 7. Now we're ready to run the program, but we need to navigate to the correct folder first, so type```cd .\gui_version\```and press enter 
 8. Finally, type```python gui_version.py```then press enter and the program will run. If you encounter any errors now, the terminal will give you an errormessage, which it wouldn't do it you'd just started it by doubleclicking the script.
 9. Confirm that you want to install Elite-Insights and then close the program again once it's done installing
-10. Edit the .ini file that was created with notepad and add in your log-folder behind "logpath =". Here you can also change some other settings like color scheme etc.
+10. Edit the .ini file that was created with notepad and add in your log-folder behind "logpath =". Here you can also change some other settings like color scheme etc. Once everything is set up correctly you can restart the program by once again typing ```python gui_version.py```or pressing the "Up" key to automatically tab back to your previous command in the terminal and pressing enter.
 11. (Optional) Because starting it from the Terminal everytime is kind of tedious, I'd recommend creating a shortcut of gui_version.py and moving it to your Desktop or, alternatively, your Startup folder (Win+R -> shell:startup -> enter)
 ## Linux
 While providing a binary for Linux is much easier, I still havent done so. If there is interest just shoot me a message.
