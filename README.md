@@ -1,5 +1,5 @@
 # Little uploader
-Threw it together because the official uploader doesn't work on Linux. Or maybe I'm just stupid.
+Threw it together because the official uploader doesn't work on Linux.
 Does nothing fancy, it watches for new logs and uploads them to dps.report and then optinally adds that to the wingman queue.
 # Disclaimer: Use at your own risk
 I am trying my best, but I can't take responsibility for this app crashing or not working correctly. If you find any mistakes please let me know. Please check the source code if you do not trust the app. Message me with any concerns, Im not a python expert, send me an email or open an issue or submit a PR if you can see ways to improve it, but try to be nice :(
