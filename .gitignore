@@ -24,3 +24,7 @@ venv_uploader/
 venv_updates/
 gui_version/output.txt
 Releases/
+gui_version/dist
+gui_version/build
+*.spec
+*.log
