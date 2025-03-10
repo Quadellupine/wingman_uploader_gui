@@ -28,3 +28,5 @@ gui_version/dist
 gui_version/build
 *.spec
 *.log
+venvtest/
+LogFC-main/

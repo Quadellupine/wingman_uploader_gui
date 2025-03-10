@@ -5,7 +5,7 @@ import os
 import requests
 import platform
 from collections import Counter
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 
 def write_log(text):
     try:

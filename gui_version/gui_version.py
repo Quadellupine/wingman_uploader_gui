@@ -6,7 +6,7 @@ from watchdog.events import PatternMatchingEventHandler
 import sys
 import os
 import requests
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 import pyperclip
 import configparser
 import queue
@@ -329,7 +329,10 @@ ignore_patterns = None
 ignore_directories = False
 case_sensitive = True
 my_event_handler = PatternMatchingEventHandler(
-    patterns, ignore_patterns, ignore_directories, case_sensitive
+    patterns=["*"],  # Example pattern: matches all files
+    ignore_patterns=[],  # Example: no ignored patterns
+    ignore_directories=True,  # Whether to ignore directories
+    case_sensitive=False  # Whether matching is case-sensitive
 )
 
 my_event_handler.on_created = on_created

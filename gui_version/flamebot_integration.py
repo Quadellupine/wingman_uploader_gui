@@ -1,4 +1,4 @@
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 import wget
 import os
 from utils import get_current_time, confirm_download
