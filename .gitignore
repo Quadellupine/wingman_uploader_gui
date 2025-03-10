@@ -30,3 +30,4 @@ gui_version/build
 *.log
 venvtest/
 LogFC-main/
+output.txt

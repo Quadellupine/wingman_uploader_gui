@@ -83,7 +83,7 @@ def license_popup():
             [sg.HorizontalSeparator()],
             [sg.Text("Licensing:",justification="center",font=('Helvetica', 14))],
             [sg.Text("Requests: Apache 2.0")],
-            [sg.Text("Pysimplegui (Version 4.x): GNU LESSER GENERAL PUBLIC LICENSE")],
+            [sg.Text("Pysimplegui/Freesimplegui (Version 4.x): GNU LESSER GENERAL PUBLIC LICENSE")],
             [sg.Text("watchdog: Apache 2.0")],
             [sg.Text("wget: Public Domain")],
             [sg.Text("Pyperclip: See licenses.txt on github(link above)")],
@@ -267,7 +267,7 @@ textbox = [
         key="table",
         expand_x=True,
         expand_y=True,
-        enable_click_events=True,
+        enable_events=True,
         auto_size_columns=False,
         col_widths=col_widths,
         row_height=20,
@@ -426,15 +426,17 @@ try:
         elif event == "batch":
             batch_upload_window(logpath)
            
-        elif "+CLICKED+" in event:            
+        elif "table" in event:            
             # The event objects contains: The source, the event name and then the cell that has been clicked as a tuple. This means we can access the row like this:
             row = event[2][0]
+            selected_row = values["table"][0]
             try:
                 # Now we look up the log in the data array, which holds the contents of the table that is displayed
-                selected_link = data[row][1]
+                selected_link = data[selected_row][1]
                 pyperclip.copy(selected_link)
                 #sg.popup_notify("Copied!", display_duration_in_ms=1000, fade_in_duration=0, alpha=1)
-            except:
+            except Exception as e:
+                print(e)
                 pass
         # Copying last visible link to clipboard
         elif event == "Copy last to Clipboard":
