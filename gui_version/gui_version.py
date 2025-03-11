@@ -352,10 +352,10 @@ seen_files = []
 link_collection = []
 # These are for debugging if needed
 #duration, success = get_info_from_json("https://dps.report/NxAB-20240320-215554_matt")
-#result_queue.put((True, "https://dps.report/UnVl-20240624-215137_trin", 10))
+result_queue.put((True, "https://dps.report/UnVl-20240624-215137_trin", 10))
 #result_queue.put((True, "https://dps.report/KzO5-20240624-231234_skor", 10))
 #result_queue.put((True, "https://dps.report/yxfq-20240624-220623_trin", 10))
-#result_queue.put((False, "_trio_wipe", 0))
+result_queue.put((False, "_trio_wipe", 0))
 
 try:
     while True:
@@ -428,9 +428,8 @@ try:
            
         elif "table" in event:            
             # The event objects contains: The source, the event name and then the cell that has been clicked as a tuple. This means we can access the row like this:
-            row = event[2][0]
-            selected_row = values["table"][0]
             try:
+                selected_row = values["table"][0]
                 # Now we look up the log in the data array, which holds the contents of the table that is displayed
                 selected_link = data[selected_row][1]
                 pyperclip.copy(selected_link)
@@ -441,8 +440,7 @@ try:
         # Copying last visible link to clipboard
         elif event == "Copy last to Clipboard":
             try:
-                last = window["table"].get()
-                last = last[-1][1]
+                last = data[-1][1]
             except Exception as e:
                 print(get_current_time(), e)
                 last = ""
