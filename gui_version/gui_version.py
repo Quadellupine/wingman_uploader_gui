@@ -352,10 +352,10 @@ seen_files = []
 link_collection = []
 # These are for debugging if needed
 #duration, success = get_info_from_json("https://dps.report/NxAB-20240320-215554_matt")
-result_queue.put((True, "https://dps.report/UnVl-20240624-215137_trin", 10))
+#result_queue.put((True, "https://dps.report/UnVl-20240624-215137_trin", 10))
 #result_queue.put((True, "https://dps.report/KzO5-20240624-231234_skor", 10))
 #result_queue.put((True, "https://dps.report/yxfq-20240624-220623_trin", 10))
-result_queue.put((False, "_trio_wipe", 0))
+#result_queue.put((False, "_trio_wipe", 0))
 
 try:
     while True:
