@@ -146,7 +146,9 @@ def upload(log, wingman, retry_count):
         lines = f.readlines()
     os.remove(ei_log)
     dps_link = ""
+    debug_log = ""
     for line in lines:
+        debug_log += line
         if "dps.report" in line:
             dps_link = line.split(" ")[1]
             dps_link = dps_link.replace("\n", "")
@@ -159,6 +161,7 @@ def upload(log, wingman, retry_count):
     # Restart if upload fails?? 
     if not wingman and dps_link == "":
         print(get_current_time(),"Upload failed, retrying")
+        print(debug_log)
         if retry_count < 30:
             time.sleep(30)
             retry_count = retry_count +1
