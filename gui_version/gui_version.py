@@ -297,7 +297,7 @@ checkbox_two = [
 ]
 batch_upload = [
     sg.Button("Batch Upload", key="batch", size=(13, 1)),
-    sg.Button("Brizeh's Flamebot", key="flame", size=(13, 1)),
+    sg.Button("Flamebot", key="flame", size=(13, 1)),
     sg.Button("About", key="about", size=(13, 1)),
 ]
 
