@@ -60,14 +60,13 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
     else:
         flameoutput = subprocess.run(["python3", "main.py"],cwd="GW2-Flamebot-Extended/GW2-Flamebot-Extended-main",capture_output=True,text=True)
     
-    #print(flameoutput.stdout)
-    #print(flameoutput.stderr)
+    print(flameoutput.stdout)
+    print(flameoutput.stderr)
     outfile = flame_output_path+"/output.txt"
     with open(outfile, 'w', encoding='utf-8') as file:
         file.write(flameoutput.stdout)
     
     if use_webhook:
-        print(use_webhook)
         titles = []
         wings = flameoutput.stdout.split("# W")
         for wing in wings:
