@@ -331,7 +331,7 @@ english = {
     
     "MVP BOON SETUP NO COM": "*  I don't know what the fuck you were smoking when you made this cursed ass squad comp but I want some, maybe it will help me cope with the fact that I had to go through this dogshit squad comp.",
     
-    "MVP NO FOOD": "* {mvp_names} showed everyone how poor they are by not using food/utility and saving their precious 30 silver.",
+    "MVP NO FOOD": "* {mvp_names} showed everyone how poor they are by not using **food** and/or **utility** and saving their precious 30 silver.",
 
     "MVP BUYER POV": "* {mvp_names}, don't forget to send the **mystic coins** to the commander as you might as well have bought this encounter.",
 

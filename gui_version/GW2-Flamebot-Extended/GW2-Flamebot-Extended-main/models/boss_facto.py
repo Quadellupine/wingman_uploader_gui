@@ -79,5 +79,6 @@ class BossFactory:
     @staticmethod
     def create_boss(log : Log):
         boss_name = BOSS_DICT.get(log.jcontent['triggerID']) or EXTRA_BOSS_DICT.get(log.jcontent['triggerID'])
+        # print(log.jcontent['triggerID']) # Use to obtain boss id from log
         if boss_name:
             ALL_BOSSES.append(_BOSS_FACTORY[boss_name](log))

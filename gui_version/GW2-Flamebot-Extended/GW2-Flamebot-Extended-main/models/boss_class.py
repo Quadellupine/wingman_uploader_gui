@@ -695,6 +695,13 @@ class Boss:
 
         # Find people without food
         for i in self.player_list:
+            # Check if a skill issue negative amount of food was used
+            Con_check = list(self.log.pjcontent["players"][i].keys())
+            if "consumables" not in Con_check:
+                no_food.append(i)
+                continue
+            
+            # Otherwise check writting
             Cons = self.log.pjcontent["players"][i]['consumables']
             count = 0
             count_lim = 2

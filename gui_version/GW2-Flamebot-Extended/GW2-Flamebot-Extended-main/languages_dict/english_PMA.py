@@ -331,7 +331,7 @@ english_PMA = {
     
     "MVP BOON SETUP NO COM": "*  It looks like something went horribly wrong with the squad comp! Please recheck if boon and healer players are sorted correctly in the subs!]*",
     
-    "MVP NO FOOD": "* {mvp_names} forgot to use their food/utility! Please make sure that you refresh before the next boss!",
+    "MVP NO FOOD": "* {mvp_names} forgot to use their **food** and/or **utility**! Please make sure that you refresh before the next boss!",
     
     "MVP BUYER POV": "* {mvp_names}, remember to cheer up the squad after dying early in the fight! Good morale helps a ton.",
 

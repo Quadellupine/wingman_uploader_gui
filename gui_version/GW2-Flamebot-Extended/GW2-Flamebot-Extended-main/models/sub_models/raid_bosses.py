@@ -2863,7 +2863,7 @@ class Q1(Boss):
     
     # Check if player is in fire AoE
     def got_q1_fire_aoe(self, i_player: int):
-        return self.get_mech_value(i_player, "Inferno Pool") > 0
+        return self.get_mech_value(i_player, "Inferno Pool") > 1
         
     # Check if player is in Qadim hitbox
     def got_q1_hitbox(self, i_player: int):

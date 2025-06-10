@@ -47,10 +47,23 @@ def main(input_file, **kwargs) -> None:
         BossFactory.create_boss(log)
     print("\n")
     split_run_message = func.get_message_reward(ALL_BOSSES, ALL_PLAYERS, titre=DEFAULT_TITLE)
-    for message in split_run_message:
-        print(message)
+    #for message in split_run_message:
+    #    print(message)
+    #
+    #print("\n")
 
-    print("\n")
+    # Remove all blanks from the text and print
+    for i in range(len(split_run_message)):
+        text = split_run_message[i]
+        text_out = "".join([s for s in text.strip().splitlines(True) if s.strip()])
+        print(text_out)
+
+    # Write to text file
+    #with open("Flame_Output.txt", "w") as f: 
+    #    for i in range(len(split_run_message)): 
+    #        text = split_run_message[i]
+    #        text_out = "".join([s for s in text.strip().splitlines(True) if s.strip()])      
+    #        f.write(text_out)
 
 if __name__ == "__main__":
     print("Starting\n")
@@ -58,12 +71,13 @@ if __name__ == "__main__":
     
     # Language selection: 
     #
-    # "EN"     : General flame
-    # "EN_PMA" : PMA, notices mechanics but doesn't flame too much.
-    # "EN"     : French, legacy code, doesn't work anymore
-    # "DE"     : German, translated by someone who doesn't know German :)
+    # "EN"       : General flame
+    # "EN_PMA"   : PMA, notices mechanics but doesn't flame too much.
+    # "EN_short" : short and concise, doesn't really flame
+    # "EN"       : French, legacy code, doesn't work anymore
+    # "DE"       : German, translated by someone who doesn't know German :)
     
-    LANGUES["selected_language"] = LANGUES["EN"]
+    LANGUES["selected_language"] = LANGUES["EN_PMA"]
     
     
     args = _make_parser().parse_args()

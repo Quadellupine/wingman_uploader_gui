@@ -42,6 +42,7 @@ BOSS_DICT = {
     
     26725: "greer",
     26774: "deci",
+    26867: "deci", # CM
     26712: "ura",
     
     #  IBS BOSSES
