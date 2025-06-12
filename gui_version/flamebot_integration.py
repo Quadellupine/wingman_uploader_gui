@@ -46,7 +46,15 @@ def check_database():
         if table_exists:
             return True  
         else:
-            print(get_current_time(), "Database exists but is corrupted.")
+            print(get_current_time(), "Database exists but hooks table is missing. The easiest way to resolve is to delete the DB.")
+            return False 
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='selected' AND name='hooks';")
+        table_exists = cursor.fetchone()
+        conn.close()
+        if table_exists:
+            return True  
+        else:
+            print(get_current_time(), "Database exists but selected table is missing. The easiest way to resolve is to delete the DB.")
             return False 
     else:
         return False
@@ -62,6 +70,11 @@ def create_database():
     name CHAR(50) NOT NULL
     ); """
     cursor.execute(table)
+    table = """ CREATE TABLE selected (
+    selection VARCHAR(255) NOT NULL,
+    name CHAR(50) NOT NULL
+    ); """
+    cursor.execute(table)
     conn.close()
 
 def add_entry_to_db(name, discord_hook):
@@ -70,6 +83,21 @@ def add_entry_to_db(name, discord_hook):
     cursor.execute("INSERT INTO hooks (name, discord_hook) VALUES (?, ?)", (name, discord_hook))
     conn.commit()
     conn.close()
+
+def save_selected(selection, name):
+    conn = sqlite3.connect("hooks.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO selected (selection, name) VALUES (?, ?)", (selection, name))
+    conn.commit()
+    conn.close()
+
+def get_selected(name):
+    conn = sqlite3.connect('hooks.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT selection FROM selected WHERE name = ?",(name,)) 
+    row = cursor.fetchone()
+    conn.close()
+    return row[0]
 
 def delete_entry_from_db(row_id):
     conn = sqlite3.connect("hooks.db")
@@ -130,8 +158,10 @@ def dropdown_tokens(pos_x, pos_y):
             selected_token = values['-DROPDOWN-']
             if selected_token:
                 print(get_current_time(), selected_token,"selected.")
+                save_selected(selected_token, "current")
             else:
                 print(get_current_time(), "No token selected.")
+                save_selected("", "current")
             # Exit loop after user selects token
             break
 
@@ -141,8 +171,6 @@ def dropdown_tokens(pos_x, pos_y):
             window.close()
             dropdown_tokens(pos_x, pos_y)
     window.close()
-    # The causes issue because of the recursive calling of the window
-    return selected_token
 
 
 # Window for Hook management
@@ -233,7 +261,8 @@ def flamebot_input(pos_x, pos_y,flame_lang, flame_output_path, use_webhook):
     # Only open token selection dialog if user wants to output to discord in the first place
     guild = ""
     if use_webhook:
-        guild = dropdown_tokens(pos_x, pos_y)
+        dropdown_tokens(pos_x, pos_y)
+        guild = get_selected("current")
     # Act accordingly
     if guild == "":
         print(get_current_time(), "No guild selected, only running locally")
