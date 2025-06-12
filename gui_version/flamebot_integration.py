@@ -84,20 +84,25 @@ def add_entry_to_db(name, discord_hook):
     conn.commit()
     conn.close()
 
+
 def save_selected(selection, name):
+    print(get_current_time(),"Saving to DB at:", os.path.abspath("hooks.db"))
     conn = sqlite3.connect("hooks.db")
     cursor = conn.cursor()
+    cursor.execute("DELETE FROM selected")
     cursor.execute("INSERT INTO selected (selection, name) VALUES (?, ?)", (selection, name))
     conn.commit()
     conn.close()
 
 def get_selected(name):
+    print(get_current_time(),"Reading from DB at:", os.path.abspath("hooks.db"))
     conn = sqlite3.connect('hooks.db')
     cursor = conn.cursor()
     cursor.execute("SELECT selection FROM selected WHERE name = ?",(name,)) 
     row = cursor.fetchone()
     conn.close()
-    return row[0]
+    return row[0] if row else None
+
 
 def delete_entry_from_db(row_id):
     conn = sqlite3.connect("hooks.db")
@@ -259,10 +264,10 @@ def flamebot_input(pos_x, pos_y,flame_lang, flame_output_path, use_webhook):
 
     # Check flame output settings
     # Only open token selection dialog if user wants to output to discord in the first place
-    guild = ""
     if use_webhook:
         dropdown_tokens(pos_x, pos_y)
-        guild = get_selected("current")
+    guild = ""
+    guild = get_selected("current")
     # Act accordingly
     if guild == "":
         print(get_current_time(), "No guild selected, only running locally")
