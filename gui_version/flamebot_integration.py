@@ -187,7 +187,7 @@ def create_crud_window(pos_x, pos_y):
     # Header row
     header = [
         sg.Text("Name", size=(20, 1), font=('Helvetica', 10, 'bold')),
-        sg.Text("Discord Hooks", size=(40, 1), font=('Helvetica', 10, 'bold')),
+        sg.Text("Discord Hook", size=(40, 1), font=('Helvetica', 10, 'bold')),
         sg.Text("", size=(3, 1)) # For the 'X' button column
     ]
 
@@ -197,7 +197,7 @@ def create_crud_window(pos_x, pos_y):
         row_id, name, discord_hook = row
         data_rows.append([
             sg.Input(default_text=name, key=f'-NAME-{row_id}', disabled=True, size=(20,1)),
-            sg.Input(default_text=discord_hook, key=f'-HOOK-{row_id}', disabled=True, size=(40,1)),
+            sg.Input(default_text=discord_hook, key=f'-HOOK-{row_id}', disabled=True, size=(60,1)),
             sg.Button("X", key=f'-DELETE-{row_id}', size=(3, 1), button_color=('white', 'red'))
         ])
 
@@ -212,7 +212,7 @@ def create_crud_window(pos_x, pos_y):
 
     # Main window layout
     layout = [
-        [sg.Column(data_display_column_layout, scrollable=True, vertical_scroll_only=True, size=(680, 300), key='-DATA_COLUMN-', expand_x=True)],
+        [sg.Column(data_display_column_layout, scrollable=True, vertical_scroll_only=True, size=(680, 300), key='-DATA_COLUMN-', expand_x=False)],
         [sg.HSeparator()],
         add_new_section
     ]
@@ -241,7 +241,7 @@ def hook_management(pos_x, pos_y):
                 sg.popup_error("Both Name and Discord Hook are required to add an entry.",location=(pos_x, pos_y))
         elif event.startswith('-DELETE-'):
             row_id_to_delete = int(event.split('-')[-1])
-            if sg.popup_yes_no(f"Are you sure you want to delete entry with ROWID {row_id_to_delete}?",location=(pos_x, pos_y)) == 'Yes':
+            if sg.popup_yes_no(f"Are you sure you want to delete entry with id {row_id_to_delete}?",location=(pos_x, pos_y)) == 'Yes':
                 delete_entry_from_db(row_id_to_delete)
                 # Close the current window and create a new one
                 window.close()
@@ -302,8 +302,6 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
     else:
         flameoutput = subprocess.run(["python3", "main.py"],cwd="GW2-Flamebot-Extended/GW2-Flamebot-Extended-main",capture_output=True,text=True)
     
-    #print(flameoutput.stdout)
-    #print(flameoutput.stderr)
     outfile = flame_output_path+"/output.txt"
     with open(outfile, 'w', encoding='utf-8') as file:
         file.write(flameoutput.stdout)
