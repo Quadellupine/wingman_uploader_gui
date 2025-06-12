@@ -41,7 +41,7 @@ if not os.path.exists(config_file_path):
     with open("config.ini", "w") as file:
         # Create .ini file with some defaults
         file.write(
-            "[Settings]\nshowwipes = False\nlogpath=.\ntheme = Topanga\npushwipes = False\nno_wingman = False\nfilter_shitlogs = True\nheight=500\nwidth=470\nflame_lang=EN\nflame_output_path=.\nuse_webhook = True\ndiscord_webhook ="
+            "[Settings]\nshowwipes = False\nlogpath=.\ntheme = Topanga\npushwipes = False\nno_wingman = False\nfilter_shitlogs = True\nheight=500\nwidth=470\nflame_lang=EN\nflame_output_path=.\nuse_webhook = True"
         )
         file.close()
     config.read(config_file_path)
@@ -61,7 +61,6 @@ try:
     size_tuple = (width, height)
     flame_lang = config["Settings"]["flame_lang"]
     flame_output_path = config["Settings"]["flame_output_path"]
-    webhook = config["Settings"]["discord_webhook"]
     use_webhook = config.getboolean("Settings", "use_webhook")
 except:
     sg.popup("Malformed config.ini. Delete it to generate a clean one.", title="Error")
@@ -468,7 +467,7 @@ try:
         elif event == "flame":
             print(get_current_time(), "Activating flamebot")
             pos_x, pos_y = get_position()
-            flamebot_input(pos_x, pos_y, flame_lang,flame_output_path, webhook, use_webhook)
+            flamebot_input(pos_x, pos_y, flame_lang,flame_output_path, use_webhook)
         # Reset memory of links
         elif event == "Reset":
             clear_table()

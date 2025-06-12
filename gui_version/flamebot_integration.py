@@ -7,6 +7,7 @@ import subprocess
 import platform
 import requests
 import configparser
+import sqlite3
 
 # This is terrible, pls give me a proper way to do this brizeh...
 def change_language(lang_string):
@@ -26,14 +27,125 @@ def split_links(input_string):
         if link:
             output.append("https"+link)
     return output
+# Check if database exists, create it if it doesnt.
 
-def flamebot_input(pos_x, pos_y,flame_lang, flame_output_path, webhook, use_webhook):
+def check_database():
+    # Check if the database file exists
+    if os.path.isfile("hooks.db"):
+        conn = sqlite3.connect('hooks.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='hooks';")
+        table_exists = cursor.fetchone()
+        conn.close()
+        if table_exists:
+            return True  
+        else:
+            print(get_current_time(), "Database exists but is corrupted.")
+            return False 
+    else:
+        return False
+def create_database():
+    # Delete existing Database
+    os.remove("hooks.db")
+    # Create it from scratch
+    conn = sqlite3.connect('hooks.db')
+    cursor = conn.cursor()
+    table = """ CREATE TABLE hooks (
+    discord_hook VARCHAR(255) NOT NULL,
+    name CHAR(50) NOT NULL
+    ); """
+    cursor.execute(table)
+    conn.close()
+
+def insert_token(token, name):
+    conn = sqlite3.connect('hooks.db')
+    cursor = conn.cursor()
+    cursor.execute('''INSERT INTO hooks (discord_hook, name) VALUES (?, ?)''', (token, name))
+    conn.commit()
+    conn.close()
+
+def delete_token(token, name):
+    conn = sqlite3.connect('hooks.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM hooks WHERE name = ?", (name,))
+    conn.commit()
+    conn.close()
+
+def get_hook_from_name(name):
+    conn = sqlite3.connect('hooks.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT discord_hook FROM hooks WHERE name = ?",(name,)) 
+    row = cursor.fetchone()
+    conn.close()
+    return row[0]
+
+def get_tokens():
+    conn = sqlite3.connect('hooks.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT discord_hook, name FROM hooks") 
+    rows = cursor.fetchall()
+    conn.close()
+    items = [(row[1]) for row in rows]
+    return items
+
+def dropdown_tokens():
+    items = get_tokens()  # Fetch tokens from the database
+
+    layout = [
+        [sg.Text('Select a Guild:')],
+        [sg.Combo(items, key='-DROPDOWN-', size=(30, 5),font=('Helvetica', 12), readonly=True)],
+        [sg.Button('OK'), sg.Button('No Hook')]
+    ]
+    
+    window = sg.Window('Select Guild', layout)
+    
+    # Event loop for the dropdown tokens window
+    while True:
+        event, values = window.read()
+        
+        if event == sg.WINDOW_CLOSED or event == 'No Hook':
+            selected_token = ""
+            break
+        
+        if event == 'OK':
+            selected_token = values['-DROPDOWN-']
+            if selected_token:
+                print(get_current_time(), selected_token,"selected.")
+            else:
+                print(get_current_time(), "No token selected.")
+            # Exit loop after user selects token
+            break
+
+    window.close()
+    return selected_token
+
+def flamebot_input(pos_x, pos_y,flame_lang, flame_output_path, use_webhook):
     logs = sg.popup_get_text("Paste the logs you want to run the flamebot on:",location=(pos_x, pos_y))
     if logs == None:
         print(get_current_time(), "Window closed without submitting logs")
         return
     logs = split_links(logs)
-    run_flamebot(logs,flame_lang, flame_output_path, webhook, use_webhook)
+    # Sanity check database, TODO: Add Check for whether the correct table exists
+    db_exists = check_database()
+    if not db_exists:
+        create_database()
+        print(get_current_time(), "Database for discord hooks did not exist. Created hooks.db")
+    elif db_exists:
+        print(get_current_time(), "Database for discord hooks exists and has the correct tables.")
+
+
+    # Check flame output settings
+    # Only open token selection dialog if user wants to output to discord in the first place
+    guild = ""
+    if use_webhook:
+        guild = dropdown_tokens()
+    # Act accordingly
+    if guild == "":
+        print(get_current_time(), "No guild selected, only running locally")
+        run_flamebot(logs,flame_lang, flame_output_path, guild, False)
+    else:
+        print(get_current_time(), guild,"selected, flaming to discord in addition to regular output")
+        run_flamebot(logs,flame_lang, flame_output_path, get_hook_from_name(guild), use_webhook)
     
 def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
     BrizehUrl = "https://github.com/Lemon-Dealer/GW2-Flamebot-Extended/archive/refs/heads/main.zip"
@@ -61,7 +173,7 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
         flameoutput = subprocess.run(["python3", "main.py"],cwd="GW2-Flamebot-Extended/GW2-Flamebot-Extended-main",capture_output=True,text=True)
     
     print(flameoutput.stdout)
-    print(flameoutput.stderr)
+    #print(flameoutput.stderr)
     outfile = flame_output_path+"/output.txt"
     with open(outfile, 'w', encoding='utf-8') as file:
         file.write(flameoutput.stdout)
@@ -74,12 +186,10 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
         # Remove debug output from flamebot itself
         wings = wings[1:]
         titles = titles[1:]
-        # Remove first line which is used as a title instead
+        # Remove first line which is used as a title instead, this also catches runs with errors but is not robust. Need to talk to Lemon.
         wings = ["\n".join(s.splitlines()[1:]) for s in wings]
         titles = ["W" + s for s in titles]
         send_discord_embeds(webhook, wings, titles)
-
-import requests
 
 def send_discord_embeds(webhook_url: str, contents: list[str], titles: list[str] = None, max_chars=6000):
     if titles is None:
