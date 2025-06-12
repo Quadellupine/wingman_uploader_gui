@@ -142,11 +142,11 @@ def get_data():
 ## Window that shows the dropdown to select a guild
 def dropdown_tokens(pos_x, pos_y):
     items = get_names()  # Fetch tokens from the database
-
+    last=get_selected("current")
     layout = [
         [sg.Text('Select a Guild:')],
-        [sg.Combo(items, key='-DROPDOWN-', size=(30, 5),font=('Helvetica', 12), readonly=True)],
-        [sg.Button('OK'), sg.Button('No Hook'), sg.Button("Manage Hooks")],
+        [sg.Combo(items, key='-DROPDOWN-', size=(30, 5),font=('Helvetica', 12), readonly=True, default_value=last)],
+        [sg.Button('Only Local'), sg.Button("Manage Guilds"),sg.Button('Go')],
     ]
     
     window = sg.Window('Select Guild', layout, location=(pos_x, pos_y))
@@ -155,11 +155,12 @@ def dropdown_tokens(pos_x, pos_y):
     while True:
         event, values = window.read()
         
-        if event == sg.WINDOW_CLOSED or event == 'No Hook':
+        if event == sg.WINDOW_CLOSED or event == 'Only Local':
             selected_token = ""
+            save_selected("", "current")
             break
         
-        if event == 'OK':
+        if event == 'Go':
             selected_token = values['-DROPDOWN-']
             if selected_token:
                 print(get_current_time(), selected_token,"selected.")
@@ -170,7 +171,7 @@ def dropdown_tokens(pos_x, pos_y):
             # Exit loop after user selects token
             break
 
-        if event =="Manage Hooks":
+        if event =="Manage Guilds":
             pos_x, pos_y = get_position(window)
             hook_management(pos_x, pos_y)
             window.close()
