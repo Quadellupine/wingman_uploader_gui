@@ -29,6 +29,12 @@ def split_links(input_string):
     return output
 # Check if database exists, create it if it doesnt.
 
+def get_position(window):
+    main_window_location = window.current_location()
+    main_window_x, main_window_y = main_window_location
+    return main_window_x, main_window_y
+
+
 def check_database():
     # Check if the database file exists
     if os.path.isfile("hooks.db"):
@@ -57,19 +63,21 @@ def create_database():
     cursor.execute(table)
     conn.close()
 
-def insert_token(token, name):
-    conn = sqlite3.connect('hooks.db')
+def add_entry_to_db(name, discord_hook):
+    conn = sqlite3.connect("hooks.db")
     cursor = conn.cursor()
-    cursor.execute('''INSERT INTO hooks (discord_hook, name) VALUES (?, ?)''', (token, name))
+    cursor.execute("INSERT INTO hooks (name, discord_hook) VALUES (?, ?)", (name, discord_hook))
     conn.commit()
     conn.close()
 
-def delete_token(token, name):
-    conn = sqlite3.connect('hooks.db')
+def delete_entry_from_db(row_id):
+    conn = sqlite3.connect("hooks.db")
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM hooks WHERE name = ?", (name,))
+    # Delete using ROWID
+    cursor.execute("DELETE FROM hooks WHERE ROWID = ?", (row_id,))
     conn.commit()
     conn.close()
+
 
 def get_hook_from_name(name):
     conn = sqlite3.connect('hooks.db')
@@ -79,7 +87,7 @@ def get_hook_from_name(name):
     conn.close()
     return row[0]
 
-def get_tokens():
+def get_names():
     conn = sqlite3.connect('hooks.db')
     cursor = conn.cursor()
     cursor.execute("SELECT discord_hook, name FROM hooks") 
@@ -88,20 +96,33 @@ def get_tokens():
     items = [(row[1]) for row in rows]
     return items
 
-def dropdown_tokens():
-    items = get_tokens()  # Fetch tokens from the database
+def get_data():
+    conn = sqlite3.connect("hooks.db")
+    cursor = conn.cursor()
+    # Select ROWID along with name and discord_hook
+    cursor.execute("SELECT ROWID, name, discord_hook FROM hooks ORDER BY name")
+    data = cursor.fetchall()
+    conn.close()
+    return data
+
+
+def dropdown_tokens(pos_x, pos_y):
+    items = get_names()  # Fetch tokens from the database
 
     layout = [
         [sg.Text('Select a Guild:')],
         [sg.Combo(items, key='-DROPDOWN-', size=(30, 5),font=('Helvetica', 12), readonly=True)],
-        [sg.Button('OK'), sg.Button('No Hook')]
+        [sg.Button('OK'), sg.Button('No Hook'), sg.Button("Manage Hooks")],
     ]
     
-    window = sg.Window('Select Guild', layout)
+    window = sg.Window('Select Guild', layout, location=(pos_x, pos_y))
     
     # Event loop for the dropdown tokens window
     while True:
-        event, values = window.read()
+        try:
+            event, values = window.read()
+        except:
+            break
         
         if event == sg.WINDOW_CLOSED or event == 'No Hook':
             selected_token = ""
@@ -116,8 +137,86 @@ def dropdown_tokens():
             # Exit loop after user selects token
             break
 
-    window.close()
+        if event =="Manage Hooks":
+            pos_x, pos_y = get_position(window)
+            hook_management(pos_x, pos_y)
+            window.close()
+            window = dropdown_tokens(pos_x, pos_y)
+    try:
+        window.close()
+    except:
+        return ""
     return selected_token
+
+
+
+def create_crud_window(pos_x, pos_y):
+    data = get_data()
+
+    # Header row
+    header = [
+        sg.Text("Name", size=(20, 1), font=('Helvetica', 10, 'bold')),
+        sg.Text("Discord Hooks", size=(40, 1), font=('Helvetica', 10, 'bold')),
+        sg.Text("", size=(3, 1)) # For the 'X' button column
+    ]
+
+    # Data rows
+    data_rows = []
+    for i, row in enumerate(data):
+        row_id, name, discord_hook = row
+        data_rows.append([
+            sg.Input(default_text=name, key=f'-NAME-{row_id}', disabled=True, size=(20,1)),
+            sg.Input(default_text=discord_hook, key=f'-HOOK-{row_id}', disabled=True, size=(40,1)),
+            sg.Button("X", key=f'-DELETE-{row_id}', size=(3, 1), button_color=('white', 'red'))
+        ])
+
+    data_display_column_layout = [header] + data_rows
+    add_new_section = [
+        sg.Text("New Name:", size=(10, 1)),
+        sg.Input(key='-NEW_NAME-', size=(20,1)),
+        sg.Text("New Hook:", size=(10, 1)),
+        sg.Input(key='-NEW_HOOK-', size=(40,1)),
+        sg.Button("Add Entry", key='-ADD_ENTRY-')
+    ]
+
+    # Main window layout
+    layout = [
+        [sg.Column(data_display_column_layout, scrollable=True, vertical_scroll_only=True, size=(680, 300), key='-DATA_COLUMN-', expand_x=True)],
+        [sg.HSeparator()],
+        add_new_section
+    ]
+
+    return sg.Window("Discord Hook Management", layout, finalize=True,location=(pos_x, pos_y))
+
+
+
+def hook_management(pos_x, pos_y):
+    window = create_crud_window(pos_x, pos_y)
+
+    while True:
+        event, values = window.read()
+
+        if event == sg.WIN_CLOSED:
+            break
+        elif event == '-ADD_ENTRY-':
+            new_name = values['-NEW_NAME-']
+            new_hook = values['-NEW_HOOK-']
+            if new_name and new_hook:
+                add_entry_to_db(new_name, new_hook)
+                # Close the current window and create a new one
+                window.close()
+                window = create_crud_window(pos_x, pos_y) # Recreate window with updated data
+            else:
+                sg.popup_error("Both Name and Discord Hook are required to add an entry.",location=(pos_x, pos_y))
+        elif event.startswith('-DELETE-'):
+            row_id_to_delete = int(event.split('-')[-1])
+            if sg.popup_yes_no(f"Are you sure you want to delete entry with ROWID {row_id_to_delete}?",location=(pos_x, pos_y)) == 'Yes':
+                delete_entry_from_db(row_id_to_delete)
+                # Close the current window and create a new one
+                window.close()
+                window = create_crud_window(pos_x, pos_y) # Recreate window with updated data
+
+    window.close()
 
 def flamebot_input(pos_x, pos_y,flame_lang, flame_output_path, use_webhook):
     logs = sg.popup_get_text("Paste the logs you want to run the flamebot on:",location=(pos_x, pos_y))
@@ -138,7 +237,7 @@ def flamebot_input(pos_x, pos_y,flame_lang, flame_output_path, use_webhook):
     # Only open token selection dialog if user wants to output to discord in the first place
     guild = ""
     if use_webhook:
-        guild = dropdown_tokens()
+        guild = dropdown_tokens(pos_x, pos_y)
     # Act accordingly
     if guild == "":
         print(get_current_time(), "No guild selected, only running locally")
@@ -172,7 +271,7 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
     else:
         flameoutput = subprocess.run(["python3", "main.py"],cwd="GW2-Flamebot-Extended/GW2-Flamebot-Extended-main",capture_output=True,text=True)
     
-    print(flameoutput.stdout)
+    #print(flameoutput.stdout)
     #print(flameoutput.stderr)
     outfile = flame_output_path+"/output.txt"
     with open(outfile, 'w', encoding='utf-8') as file:

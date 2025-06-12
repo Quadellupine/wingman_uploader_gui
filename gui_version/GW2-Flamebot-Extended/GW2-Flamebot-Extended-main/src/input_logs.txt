@@ -1,1 +1,0 @@
-httpsprint(get_current_time(), "Database exists but is corrupted.")
