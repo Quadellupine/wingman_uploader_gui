@@ -279,7 +279,7 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
             try:
                 titles.append(wing.splitlines()[0])
             except:
-                print(get_current_time(), "Could not parse Flamebot output:")
+                print(get_current_time(), "Could not parse Flamebot output. If it is empty it is likely stuck on trying to retrieve the wingman percentile data. Delete it so it can be freshly downloaded.")
                 print(flameoutput.stdout)
         # Remove debug output from flamebot itself
         wings = wings[1:]
