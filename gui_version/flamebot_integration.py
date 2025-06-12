@@ -276,7 +276,11 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
         titles = []
         wings = flameoutput.stdout.split("# W")
         for wing in wings:
-            titles.append(wing.splitlines()[0])
+            try:
+                titles.append(wing.splitlines()[0])
+            except:
+                print(get_current_time(), "Could not parse Flamebot output:")
+                print(flameoutput.stdout)
         # Remove debug output from flamebot itself
         wings = wings[1:]
         titles = titles[1:]
