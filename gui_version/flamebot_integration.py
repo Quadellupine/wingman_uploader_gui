@@ -119,10 +119,7 @@ def dropdown_tokens(pos_x, pos_y):
     
     # Event loop for the dropdown tokens window
     while True:
-        try:
-            event, values = window.read()
-        except:
-            break
+        event, values = window.read()
         
         if event == sg.WINDOW_CLOSED or event == 'No Hook':
             selected_token = ""
@@ -142,10 +139,7 @@ def dropdown_tokens(pos_x, pos_y):
             hook_management(pos_x, pos_y)
             window.close()
             window = dropdown_tokens(pos_x, pos_y)
-    try:
-        window.close()
-    except:
-        return ""
+    window.close()
     return selected_token
 
 
