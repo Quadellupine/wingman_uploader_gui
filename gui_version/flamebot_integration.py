@@ -309,7 +309,7 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
     print(get_current_time(), "Flamebot finished, check your output.txt at", flame_output_path)
     if use_webhook:
         titles = []
-        wings = flameoutput.stdout.split("# W")
+        wings = flameoutput.stdout.split("##")
         for wing in wings:
             try:
                 titles.append(wing.splitlines()[0])
@@ -320,8 +320,8 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
         wings = wings[1:]
         titles = titles[1:]
         # Remove first line which is used as a title instead, this also catches runs with errors but is not robust. Need to talk to Lemon.
-        wings = ["\n".join(s.splitlines()[1:]) for s in wings]
-        titles = ["W" + s for s in titles]
+        #wings = ["\n".join(s.splitlines()[1:]) for s in wings]
+        wings = ["##" + s for s in wings]
         send_discord_embeds(webhook, wings, titles)
 
 def send_discord_embeds(webhook_url: str, contents: list[str], titles: list[str] = None, max_chars=6000):
@@ -338,7 +338,6 @@ def send_discord_embeds(webhook_url: str, contents: list[str], titles: list[str]
         embeds = []
         for i, content in enumerate(contents_batch):
             embeds.append({
-                "title": titles_batch[i],
                 "description": content,
                 "color": 3447003
             })
