@@ -35,3 +35,5 @@ output.txt
 gui_version/GW2-Flamebot-Extended
 hooks.db
 gui_version/hooks.db
+*.db
+gui_version/*.db
