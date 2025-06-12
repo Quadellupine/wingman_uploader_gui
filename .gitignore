@@ -33,3 +33,5 @@ venvtest/
 LogFC-main/
 output.txt
 gui_version/GW2-Flamebot-Extended
+hooks.db
+gui_version/hooks.db
