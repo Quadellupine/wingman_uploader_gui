@@ -23,7 +23,7 @@ gui_version/LogFC
 venv_uploader/
 venv_updates/
 gui_version/output.txt
-gui_version/GW2-Flamebot-Extended
+gui_version/GW2-Flamebot-Extended/*
 Releases/
 gui_version/dist
 gui_version/build
