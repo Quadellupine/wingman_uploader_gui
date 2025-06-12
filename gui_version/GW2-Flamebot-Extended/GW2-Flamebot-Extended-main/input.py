@@ -20,6 +20,12 @@ class InputParser:
             not parts[0].split("-")[1].isdigit() or \
             not parts[0].split("-")[2].isdigit():
                 problems.append(url)
+        # If problematic urls are in, get rid of them and then boot the code
         if problems:
-            sys.exit(print(f"Invalid urls: {problems}"))
+            new_urls = []
+            for url in self.urls:
+                if url not in problems:
+                    new_urls.append(url)
+            self.urls = new_urls
+            #sys.exit(print(f"Invalid urls: {problems}"))
         return self

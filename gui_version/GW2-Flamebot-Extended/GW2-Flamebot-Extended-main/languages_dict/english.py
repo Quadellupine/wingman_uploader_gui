@@ -295,9 +295,9 @@ english = {
     "WOJ MVP CHAINS": "* {mvp_name} took **{max_dmg}** damage from **chains** (**{ratio:.1f}%** of the squad)",
     
     ################################ AH ################################
-    "AH MVP EXPOSED S": "* {mvp_names} cummulated **{max_exposed}** **exposed** effects",
-    "AH MVP EXPOSED P": "* {mvp_names} cummulated **{max_exposed}** **exposed** effects",
-    
+    "AH MVP EXPOSED": "* {mvp_names} got **exposed** so many times that they are now studied by scientists to reconstruct the basics of Exposure Therapy.",
+    "AH MVP GREEN": "* {mvp_names} should be ashamed of themselves for not going into the **green**. Yes queen greed that DPS on the add phase and give us nothing",
+
     ################################ KO ################################
     "KO MVP DEBIL S": "* {mvp_names} cummulated **{max_debil}** **debilitated** effects",
     "KO MVP DEBIL P": "* {mvp_names} cummulated **{max_debil}** **debilitated** effects",
@@ -327,6 +327,10 @@ english = {
     "MVP REGEN": "* {mvp_names} who own an insurance company denied the squad **Regeneration** with their AI tool. Luigi Mangione will not be happy about this.",
     "MVP SWIFT": "* Nice **Swiftness** uptime, {mvp_names}! Thanks to you the squad **can't** outrun a Centaur.",
     
+    "MVP QUICK MERGED": "* {mvp_names} not only failed giving **Quickness**, but other boons as well. Are you a DPS main by chance?",
+    "MVP ALAC MERGED": "* {mvp_names} not only failed giving **Alacrity**, but other boons as well! Are you a DPS main by chance?",
+    "MVP BOON MERGED": "* {mvp_names} took **boondps** role to the heart and decided to only contribute to 1 boon only.",
+
     "MVP BOON SETUP": "* {mvp_names} apparently never played this game before and doesn't know how to sort out quickness, alacrity, and heal players for the relevant subgroups. If you didn't have the commander tag, we would kick you already.",
     
     "MVP BOON SETUP NO COM": "*  I don't know what the fuck you were smoking when you made this cursed ass squad comp but I want some, maybe it will help me cope with the fact that I had to go through this dogshit squad comp.",

@@ -16,65 +16,114 @@ class AH(Boss):
         self.mvp = self.get_mvp()
         self.lvp = self.get_lvp()
         AH.last  = self
+
+        print(self.log.pjcontent['targets'][2])
         
     def get_mvp(self):
-        msg_exposed = self.expose_mvp()
-        if msg_exposed:
-            return msg_exposed
+        # Create MVP prompt
+        mvplist = "**MVPs** \n"
+
+        # Check for mechanics
+        msg_exposed = self.mvp_ah_exposed()
         msg_bad_dps = self.get_bad_dps()
+        msg_green_skip = self.mvp_ah_green()
+        msg_bad_boons = self.get_bad_boons('Full Fight')
+        msg_general = self.get_mvp_general()
+
+        # Add prompts to flame if mechanics are garbage
+        if msg_exposed:
+            mvplist = mvplist + msg_exposed + "\n" 
+
         if msg_bad_dps:
-            return msg_bad_dps
-        return    
+            mvplist = mvplist + msg_bad_dps + "\n" 
+
+        if msg_green_skip:
+            mvplist = mvplist + msg_green_skip + "\n" 
+
+        if msg_bad_boons:
+            mvplist = mvplist + msg_bad_boons
+
+        if msg_general:
+            mvplist = mvplist + msg_general 
+
+        # Return full list
+        return  mvplist
     
     def get_lvp(self):
-        return self.get_lvp_dps()
+        # Create LVP prompt
+        lvplist = "**LVPs** \n"
+
+        # Check for mechanics
+        msg_good_dps = self.get_lvp_dps_PMA(14)
+        msg_good_cc = self.get_lvp_cc_cleave_PMA()
+
+        # Add prompts to praise if mechanics are bussin fr fr
+        if msg_good_dps:
+            lvplist = lvplist + msg_good_dps + "\n" 
+
+        if msg_good_cc:
+            lvplist = lvplist + msg_good_cc + "\n" 
+
+        # Return full list
+        return lvplist
     
     ################################ MVP ################################
     
-    def expose_mvp(self):
-        i_players, max_exposed, _ = Stats.get_max_value(self, self.get_max_exposed, exclude=[self.is_heal])
-        mvp_names                 = self.players_to_string(i_players)
-        if max_exposed > 2:
-            self.add_mvps(i_players)
-            if len(i_players) == 1:
-                return LANGUES["selected_language"]["AH MVP EXPOSED S"].format(mvp_names=mvp_names, max_exposed=max_exposed)
-            else:
-                return LANGUES["selected_language"]["AH MVP EXPOSED P"].format(mvp_names=mvp_names, max_exposed=max_exposed)
+    # Flame the people who get exposed a lot
+    def mvp_ah_exposed(self):
+        i_players = self.get_ah_exposed()
+        self.add_mvps(i_players)
+        if i_players:
+            mvp_names = self.players_to_string(i_players)
+            return LANGUES["selected_language"]["AH MVP EXPOSED"].format(mvp_names=mvp_names)
+        return
+    
+    # Flame the people who skipped going into greens
+    def mvp_ah_green(self):
+        i_players = self.get_ah_no_green()
+        self.add_mvps(i_players)
+        if i_players:
+            mvp_names = self.players_to_string(i_players)
+            return LANGUES["selected_language"]["AH MVP GREEN"].format(mvp_names=mvp_names)
         return
     
     ################################ LVP ################################
     
-    def get_lvp_dps(self):
-        i_players, max_dmg, tot_dmg = Stats.get_max_value(self, self.get_dmg_boss)
-        ratio                       = max_dmg / tot_dmg * 100
-        time                        = self.duration_ms
-        dps                         = max_dmg / time
-        lvp_dps_name                = self.players_to_string(i_players)
-        self.add_lvps(i_players)
-        return LANGUES["selected_language"]["LVP DPS"].format(lvp_dps_name=lvp_dps_name, dps=dps, dmg_ratio=ratio)
-    
+
+    ################################ CONDITIONS ################################
+
+    # Check if player got exposed a lot
+    def got_exposed(self, i_player: int):
+        if self.get_mech_value(i_player, "Exposed Applied") > 1:
+            return True
+        else:
+            return False
+        
+    # Check if player skipped green
+    def got_no_green(self, i_player: int):
+        if self.get_mech_value(i_player, "Green Debuff") < 1:
+            return True
+        else:
+            return False
+
+
     ################################ DATA MECHAS ################################
     
-    def get_max_exposed(self, i_player: int):
-        buffUptimes   = self.log.pjcontent["players"][i_player]["buffUptimes"]
-        expose_id     = 64936
-        expose_states = None
-        for buff in buffUptimes:
-            if buff["id"] == expose_id:
-                expose_states = buff["states"]
-        exposed = 0
-        if expose_states:
-            for state in expose_states:
-                if state[1] > exposed:
-                    exposed = state[1]
-        return exposed
-    
-    def get_dmg_boss(self, i_player: int):
-        targetDmg    = self.log.pjcontent["players"][i_player]["dpsTargets"]
-        mai_trin_dmg = targetDmg[0][0]["damage"]
-        echo_dmg     = targetDmg[1][0]["damage"]
-        return mai_trin_dmg + echo_dmg 
-                
+    # Returns all players who got exposed a lot
+    def get_ah_exposed(self):
+        noobs = []
+        for i in self.player_list:
+            if self.got_exposed(i):
+                noobs.append(i)
+        return noobs   
+
+    # Returns all players who didn't do green
+    def get_ah_no_green(self):
+        die_Grünen = []
+        for i in self.player_list:
+            if self.got_no_green(i):
+                die_Grünen.append(i)
+        return die_Grünen       
     
 ################################ ANKKA ################################
 

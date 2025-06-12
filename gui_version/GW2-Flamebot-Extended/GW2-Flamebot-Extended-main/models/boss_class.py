@@ -246,6 +246,13 @@ class Boss:
     def get_dmg_boss(self, i_player: int):
         return self.log.pjcontent['players'][i_player]['dpsTargets'][0][self.real_phase_id]['damage']
     
+    # Return Total Cleave
+    def get_dmg_cleave(self, i_player: int, targets: int):
+        dmg = 0
+        for i in range(targets):
+            dmg += self.log.pjcontent['players'][i_player]['dpsTargets'][i][self.real_phase_id]['damage']
+        return dmg
+    
     def get_cc_total(self, i_player: int):
         return self.log.pjcontent['players'][i_player]['dpsAll'][0]['breakbarDamage']
     
@@ -442,6 +449,7 @@ class Boss:
         quick_sub2 = 69
         heal_sub1 = 69
         heal_sub2 = 69
+        soloheal = False
         
         Group_No = self.log.pjcontent['players'][2]['group']
         
@@ -475,15 +483,15 @@ class Boss:
                     if not self.log.pjcontent['players'][i]['group'] == Group_No:
                         heal_sub2 = i
 
-        # Flame commander if boon player situation is ???
+        # Generic flame if boon player situation is ???
         if alac_sub1 == 69 or alac_sub2 == 69 or quick_sub1 == 69 or quick_sub2 == 69:
-            for i in self.player_list:
-                if self.log.pjcontent['players'][i]['hasCommanderTag']:
-                    self.add_mvps([i])
-                    mvp_names = self.players_to_string([i])
-                    return LANGUES["selected_language"]["MVP BOON SETUP"].format(mvp_names=mvp_names)
-                else:
-                    return LANGUES["selected_language"]["MVP BOON SETUP NO COM"]
+            return LANGUES["selected_language"]["MVP BOON SETUP NO COM"]
+        
+        # Tag soloheal if exists
+        if heal_sub1 == 69 and heal_sub2 < 69:
+            soloheal = True
+        if heal_sub2 == 69 and heal_sub1 < 69:
+            soloheal = True
               
         # Get boon uptimes
         mvp_might_sub1 = []
@@ -554,30 +562,34 @@ class Boss:
             if self.log.pjcontent['players'][i]['group'] == Group_No:
                 if self.get_boon_uptime(i, 'Protection', phase) < threshold:
                     if heal_sub1 == 69:
-                        mvp_prot_sub1.append(alac_sub1)
-                        mvp_prot_sub1.append(quick_sub1)
+                        if not soloheal:
+                            mvp_prot_sub1.append(alac_sub1)
+                            mvp_prot_sub1.append(quick_sub1)
                     else:
                         mvp_prot_sub1.append(heal_sub1)
             else:
                 if self.get_boon_uptime(i, 'Protection', phase) < threshold:
                     if heal_sub2 == 69:
-                        mvp_prot_sub2.append(alac_sub2)
-                        mvp_prot_sub2.append(quick_sub2)
+                        if not soloheal:
+                            mvp_prot_sub2.append(alac_sub2)
+                            mvp_prot_sub2.append(quick_sub2)
                     else:
                         mvp_prot_sub2.append(heal_sub2)
             # Regeneration
             if self.log.pjcontent['players'][i]['group'] == Group_No:
                 if self.get_boon_uptime(i, 'Regeneration', phase) < threshold:
                     if heal_sub1 == 69:
-                        mvp_regen_sub1.append(alac_sub1)
-                        mvp_regen_sub1.append(quick_sub1)
+                        if not soloheal:
+                            mvp_regen_sub1.append(alac_sub1)
+                            mvp_regen_sub1.append(quick_sub1)
                     else:
                         mvp_regen_sub1.append(heal_sub1)
             else:
                 if self.get_boon_uptime(i, 'Regeneration', phase) < threshold:
                     if heal_sub2 == 69:
-                        mvp_regen_sub2.append(alac_sub2)
-                        mvp_regen_sub2.append(quick_sub2)
+                        if not soloheal:
+                            mvp_regen_sub2.append(alac_sub2)
+                            mvp_regen_sub2.append(quick_sub2)
                     else:
                         mvp_regen_sub2.append(heal_sub2)
             # Swiftness   
@@ -590,7 +602,7 @@ class Boss:
                     mvp_swift_sub2.append(quick_sub2)
                     mvp_swift_sub2.append(alac_sub2)
                     
-        # Return the flame
+        # Manage MVPs
         
         mvp_might = []
         mvp_fury  = []
@@ -599,22 +611,16 @@ class Boss:
         mvp_prot  = []
         mvp_regen = []
         mvp_swift = []
-        prompt = ""
+        prompt = str("")
         threshold = 1 # Player number threshold
-        
+
         # Might
         if len(mvp_might_sub1) > 2 * threshold:
             mvp_might.append(mvp_might_sub1[0])
             mvp_might.append(mvp_might_sub1[1])
         if len(mvp_might_sub2) > 2 * threshold:
             mvp_might.append(mvp_might_sub2[0])
-            mvp_might.append(mvp_might_sub2[1])            
-        if len(mvp_might) > 0:
-            self.add_mvps(list(set(mvp_might)))
-            mvp_names = self.players_to_string(list(set(mvp_might)))
-            prompt += LANGUES["selected_language"]["MVP MIGHT"].format(mvp_names=mvp_names)
-            prompt += "\n"
-        
+            mvp_might.append(mvp_might_sub2[1])             
         # Fury
         if len(mvp_fury_sub1) > 2 * threshold:
             mvp_fury.append(mvp_fury_sub1[0])
@@ -622,56 +628,26 @@ class Boss:
         if len(mvp_fury_sub2) > 2 * threshold:
             mvp_fury.append(mvp_fury_sub2[0])
             mvp_fury.append(mvp_fury_sub2[1])         
-        if len(mvp_fury) > 0:
-            self.add_mvps(list(set(mvp_fury)))
-            mvp_names = self.players_to_string(list(set(mvp_fury)))
-            prompt += LANGUES["selected_language"]["MVP FURY"].format(mvp_names=mvp_names)
-            prompt += "\n"
-        
         # Quickness
         if len(mvp_quick_sub1) > threshold:
             mvp_quick.append(mvp_quick_sub1[0])
         if len(mvp_quick_sub2) > threshold:
-            mvp_quick.append(mvp_quick_sub2[0]) 
-        if len(mvp_quick) > 0:
-            self.add_mvps(list(set(mvp_quick)))
-            mvp_names = self.players_to_string(list(set(mvp_quick)))
-            prompt += LANGUES["selected_language"]["MVP QUICK"].format(mvp_names=mvp_names)
-            prompt += "\n"
-            
+            mvp_quick.append(mvp_quick_sub2[0])   
         # Alacrity    
         if len(mvp_alac_sub1) > threshold:
             mvp_alac.append(mvp_alac_sub1[0])
         if len(mvp_alac_sub2) > threshold:
-            mvp_alac.append(mvp_alac_sub2[0]) 
-        if len(mvp_alac) > 0:
-            self.add_mvps(list(set(mvp_alac)))
-            mvp_names = self.players_to_string(list(set(mvp_alac)))
-            prompt += LANGUES["selected_language"]["MVP ALAC"].format(mvp_names=mvp_names)
-            prompt += "\n"
-            
+            mvp_alac.append(mvp_alac_sub2[0])   
         # Protection
         if len(mvp_prot_sub1) > threshold:
             mvp_prot.append(mvp_prot_sub1[0])
         if len(mvp_prot_sub2) > threshold:
             mvp_prot.append(mvp_prot_sub2[0])
-        if len(mvp_prot) > 0:
-            self.add_mvps(list(set(mvp_prot)))
-            mvp_names = self.players_to_string(list(set(mvp_prot)))
-            prompt += LANGUES["selected_language"]["MVP PROT"].format(mvp_names=mvp_names)
-            prompt += "\n"
-        
         # Regeneration
         if len(mvp_regen_sub1) > threshold:
             mvp_regen.append(mvp_regen_sub1[0])
         if len(mvp_regen_sub2) > threshold:
             mvp_regen.append(mvp_regen_sub2[0])        
-        if len(mvp_regen) > 0:
-            self.add_mvps(list(set(mvp_regen)))
-            mvp_names = self.players_to_string(list(set(mvp_regen)))
-            prompt += LANGUES["selected_language"]["MVP REGEN"].format(mvp_names=mvp_names)
-            prompt += "\n"
-            
         # Swiftness
         if len(mvp_swift_sub1) > 2 * threshold:
             mvp_swift.append(mvp_swift_sub1[0])
@@ -679,6 +655,110 @@ class Boss:
         if len(mvp_swift_sub2) > 2 * threshold:
             mvp_swift.append(mvp_swift_sub2[0])
             mvp_swift.append(mvp_swift_sub2[1]) 
+
+        # Return Flame if quick or alac is missing on top of other boons
+        # Quickness
+        if len(mvp_quick) > 0:
+            self.add_mvps(list(set(mvp_quick)))         
+            mvp_name = []
+
+            for mvp in mvp_quick:
+                if mvp in (mvp_might + mvp_fury + mvp_prot + mvp_regen + mvp_swift):
+                    mvp_name.append(mvp)                  
+                    if mvp in mvp_might:
+                        mvp_might.remove(mvp)
+                    if mvp in mvp_fury:
+                        mvp_fury.remove(mvp)
+                    if mvp in mvp_prot:
+                        mvp_prot.remove(mvp)
+                    if mvp in mvp_regen:
+                        mvp_regen.remove(mvp)
+                    if mvp in mvp_swift:
+                        mvp_swift.remove(mvp)
+
+            mvp_quick = [mvp for mvp in mvp_quick if mvp not in mvp_name]
+            mvp_names_2 = self.players_to_string(list(set(mvp_name)))       
+            mvp_names = self.players_to_string(list(set(mvp_quick)))
+            if len(mvp_name) > 0:
+                prompt += LANGUES["selected_language"]["MVP QUICK MERGED"].format(mvp_names=mvp_names_2) + "\n"
+            if len(mvp_quick) > 0:
+                prompt += LANGUES["selected_language"]["MVP QUICK"].format(mvp_names=mvp_names) + "\n"
+
+        # Alacrity
+        if len(mvp_alac) > 0:
+            self.add_mvps(list(set(mvp_alac)))
+            mvp_name = []
+
+            for mvp in mvp_alac:
+                if mvp in (mvp_might + mvp_fury + mvp_prot + mvp_regen + mvp_swift):
+                    if mvp in mvp_might:
+                        mvp_might.remove(mvp)
+                    if mvp in mvp_fury:
+                        mvp_fury.remove(mvp)
+                    if mvp in mvp_prot:
+                        mvp_prot.remove(mvp)
+                    if mvp in mvp_regen:
+                        mvp_regen.remove(mvp)
+                    if mvp in mvp_swift:
+                        mvp_swift.remove(mvp)
+            
+            mvp_alac = [mvp for mvp in mvp_alac if mvp not in mvp_name]
+            mvp_names_2 = self.players_to_string(list(set(mvp_name)))       
+            mvp_names = self.players_to_string(list(set(mvp_alac)))     
+            if len(mvp_name) > 0:
+                prompt += LANGUES["selected_language"]["MVP ALAC MERGED"].format(mvp_names=mvp_names_2) + "\n"
+            if len(mvp_alac) > 0:
+                prompt += LANGUES["selected_language"]["MVP ALAC"].format(mvp_names=mvp_names) + "\n"
+
+
+        # Return Flame, multiple boons missing
+
+        mvp_boons = mvp_might + mvp_fury + mvp_prot + mvp_regen + mvp_swift
+        dupes = [x for n, x in enumerate(mvp_boons) if x in mvp_boons[:n]]
+        if len(dupes) > 0:
+            self.add_mvps(list(dupes))
+            mvp_names = self.players_to_string(list(set(dupes)))  
+            prompt += LANGUES["selected_language"]["MVP BOON MERGED"].format(mvp_names=mvp_names) + "\n"
+
+        for mvp in dupes:
+            if mvp in mvp_might:
+                mvp_might.remove(mvp)
+            if mvp in mvp_fury:
+                mvp_fury.remove(mvp)
+            if mvp in mvp_prot:
+                mvp_prot.remove(mvp)
+            if mvp in mvp_regen:
+                mvp_regen.remove(mvp)
+            if mvp in mvp_swift:
+                mvp_swift.remove(mvp)
+
+        # Return Flame, individual boon missing
+
+        # Might
+        if len(mvp_might) > 0:
+            self.add_mvps(list(set(mvp_might)))
+            mvp_names = self.players_to_string(list(set(mvp_might)))
+            prompt += LANGUES["selected_language"]["MVP MIGHT"].format(mvp_names=mvp_names)
+            prompt += "\n"  
+        # Fury
+        if len(mvp_fury) > 0:
+            self.add_mvps(list(set(mvp_fury)))
+            mvp_names = self.players_to_string(list(set(mvp_fury)))
+            prompt += LANGUES["selected_language"]["MVP FURY"].format(mvp_names=mvp_names)
+            prompt += "\n"
+        # Protection
+        if len(mvp_prot) > 0:
+            self.add_mvps(list(set(mvp_prot)))
+            mvp_names = self.players_to_string(list(set(mvp_prot)))
+            prompt += LANGUES["selected_language"]["MVP PROT"].format(mvp_names=mvp_names)
+            prompt += "\n"
+        # Regeneration
+        if len(mvp_regen) > 0:
+            self.add_mvps(list(set(mvp_regen)))
+            mvp_names = self.players_to_string(list(set(mvp_regen)))
+            prompt += LANGUES["selected_language"]["MVP REGEN"].format(mvp_names=mvp_names)
+            prompt += "\n"
+        # Swiftness
         if len(mvp_swift) > 0:
             self.add_mvps(list(set(mvp_swift)))
             mvp_names = self.players_to_string(list(set(mvp_swift)))
@@ -806,10 +886,36 @@ class Boss:
         lvp_names = self.players_to_string(i_players)
         cc_ratio  = collective_cc / total_cc * 100
         return LANGUES["selected_language"]["LVP BOSS CC PMA"].format(lvp_names=lvp_names, max_cc=collective_cc, cc_ratio=cc_ratio)
+    
+    # General function to get people who contributed a lot to CC
+    def get_lvp_cc_cleave_PMA(self):
+        i_players, max_cc, total_cc = Stats.get_max_value(self, self.get_cc_total)
+        if total_cc == 0:
+            return
+        # Collect other players who did a lot of CC
+        collective_cc = max_cc
+        for i in self.player_list:
+            if self.get_cc_total(i) > 0.9 * max_cc:
+                if i is not i_players[0]:
+                    i_players.append(i)
+                    collective_cc = collective_cc + self.get_cc_total(i)
+        self.add_lvps(i_players)
+        lvp_names = self.players_to_string(i_players)
+        cc_ratio  = collective_cc / total_cc * 100
+        return LANGUES["selected_language"]["LVP BOSS CC PMA"].format(lvp_names=lvp_names, max_cc=collective_cc, cc_ratio=cc_ratio)
+    
+
 
     # General function to get people who contributed a lot to DPS
-    def get_lvp_dps_PMA(self):
-        i_players, max_dmg, total_dmg = Stats.get_max_value(self, self.get_dmg_boss)
+    def get_lvp_dps_PMA(self, targets: int=1):
+        # Find max damage and total damage
+        max_dmg = 0
+        total_dmg = 0
+        for i in self.player_list:
+            total_dmg += self.get_dmg_cleave(i,targets)
+            if self.get_dmg_cleave(i,targets) > max_dmg:
+                max_dmg = self.get_dmg_cleave(i,targets)
+
         # Collect other players who did a lot of DPS
         Food_Swappers = []
         Writ_Users = []
@@ -817,9 +923,9 @@ class Boss:
         i_players = []
         collective_DPS = 0
         for i in self.player_list:
-            if self.get_dmg_boss(i) > 0.9 * max_dmg:
+            if self.get_dmg_cleave(i,targets) > 0.9 * max_dmg:
                 i_players.append(i)
-                collective_DPS = collective_DPS + self.get_dmg_boss(i) / self.duration_ms
+                collective_DPS = collective_DPS + self.get_dmg_cleave(i,targets) / self.duration_ms
                 # Check if person food swapped
                 if self.get_foodswap_count(i):
                     Food_Swappers.append(i)
@@ -827,7 +933,7 @@ class Boss:
                 if self.get_writ_user(i):
                     Writ_Users.append(i)
                 # Otherwise, add player to fair group
-                if not(self.get_foodswap_count(i) and self.get_writ_user(i)):
+                if not(self.get_foodswap_count(i) or self.get_writ_user(i)):
                     Gamers.append(i)
 
         dmg_ratio  = (collective_DPS * self.duration_ms) / total_dmg * 100

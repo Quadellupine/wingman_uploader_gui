@@ -106,7 +106,7 @@ def get_data():
     conn.close()
     return data
 
-
+## Window that shows the dropdown to select a guild
 def dropdown_tokens(pos_x, pos_y):
     items = get_names()  # Fetch tokens from the database
 
@@ -141,10 +141,11 @@ def dropdown_tokens(pos_x, pos_y):
             window.close()
             window = dropdown_tokens(pos_x, pos_y)
     window.close()
+    # The causes issue because of the recursive calling of the window
     return selected_token
 
 
-
+# Window for Hook management
 def create_crud_window(pos_x, pos_y):
     data = get_data()
 
@@ -252,7 +253,6 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
         os.remove("GW2-Flamebot-Extended-main.zip")
     
     flame_lang = '"'+flame_lang+'"'
-    change_language(flame_lang)
     os.remove("GW2-Flamebot-Extended/GW2-Flamebot-Extended-main/src/input_logs.txt")
     # Write the passed files into the required text file
     with open("GW2-Flamebot-Extended/GW2-Flamebot-Extended-main/src/input_logs.txt", "w") as file:
@@ -271,7 +271,7 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
     outfile = flame_output_path+"/output.txt"
     with open(outfile, 'w', encoding='utf-8') as file:
         file.write(flameoutput.stdout)
-    
+    print(get_current_time(), "Flamebot finished, check your output.txt at", flame_output_path)
     if use_webhook:
         titles = []
         wings = flameoutput.stdout.split("# W")
