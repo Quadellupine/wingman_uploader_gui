@@ -87,7 +87,6 @@ def add_entry_to_db(name, discord_hook):
 
 
 def save_selected(selection, name):
-    print(get_current_time(),"Saving to DB at:", os.path.abspath("hooks.db"))
     conn = sqlite3.connect("hooks.db")
     cursor = conn.cursor()
     cursor.execute("DELETE FROM selected")
@@ -96,7 +95,6 @@ def save_selected(selection, name):
     conn.close()
 
 def get_selected(name):
-    print(get_current_time(),"Reading from DB at:", os.path.abspath("hooks.db"))
     conn = sqlite3.connect('hooks.db')
     cursor = conn.cursor()
     cursor.execute("SELECT selection FROM selected WHERE name = ?",(name,)) 
@@ -143,10 +141,10 @@ def get_data():
 ## Window that shows the dropdown to select a guild
 def dropdown_tokens(pos_x, pos_y):
     items = get_names()  # Fetch tokens from the database
-    last=get_selected("current")
+    selected_token=get_selected("current")
     layout = [
         [sg.Text('Select a Guild:')],
-        [sg.Combo(items, key='-DROPDOWN-', size=(30, 5),font=('Helvetica', 12), readonly=True, default_value=last)],
+        [sg.Combo(items, key='-DROPDOWN-', size=(30, 5),font=('Helvetica', 12), readonly=True, default_value=selected_token)],
         [sg.Button('Only Local'), sg.Button("Manage Guilds"),sg.Button('Go')],
     ]
     
@@ -156,25 +154,26 @@ def dropdown_tokens(pos_x, pos_y):
     while True:
         event, values = window.read()
         
-        if event == sg.WINDOW_CLOSED or event == 'Only Local':
-            selected_token = ""
+        if event == "Only Local":
             save_selected("", "current")
             break
-        
+        if event == sg.WINDOW_CLOSED:
+            break
         if event == 'Go':
             selected_token = values['-DROPDOWN-']
+            save_selected(selected_token, "current")
             if selected_token:
                 print(get_current_time(), selected_token,"selected.")
-                save_selected(selected_token, "current")
             else:
                 print(get_current_time(), "No token selected.")
-                save_selected("", "current")
             # Exit loop after user selects token
             break
 
         if event =="Manage Guilds":
             pos_x, pos_y = get_position(window)
             hook_management(pos_x, pos_y)
+            selected_token = values['-DROPDOWN-']
+            save_selected(selected_token, "current")
             window.close()
             dropdown_tokens(pos_x, pos_y)
     window.close()
@@ -268,7 +267,6 @@ def flamebot_input(pos_x, pos_y,flame_lang, flame_output_path, use_webhook):
     # Only open token selection dialog if user wants to output to discord in the first place
     if use_webhook:
         dropdown_tokens(pos_x, pos_y)
-    guild = ""
     guild = get_selected("current")
     # Act accordingly
     if guild == "":
