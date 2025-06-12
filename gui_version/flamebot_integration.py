@@ -139,7 +139,7 @@ def dropdown_tokens(pos_x, pos_y):
             pos_x, pos_y = get_position(window)
             hook_management(pos_x, pos_y)
             window.close()
-            window = dropdown_tokens(pos_x, pos_y)
+            dropdown_tokens(pos_x, pos_y)
     window.close()
     # The causes issue because of the recursive calling of the window
     return selected_token
