@@ -52,7 +52,8 @@ def check_database():
         return False
 def create_database():
     # Delete existing Database
-    os.remove("hooks.db")
+    if os.path.isfile("hooks.db"):
+        os.remove("hooks.db")
     # Create it from scratch
     conn = sqlite3.connect('hooks.db')
     cursor = conn.cursor()
