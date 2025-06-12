@@ -8,6 +8,7 @@ import platform
 import requests
 import configparser
 import sqlite3
+import re
 
 # This is terrible, pls give me a proper way to do this brizeh...
 def change_language(lang_string):
@@ -309,7 +310,12 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
     print(get_current_time(), "Flamebot finished, check your output.txt at", flame_output_path)
     if use_webhook:
         titles = []
-        wings = flameoutput.stdout.split("##")
+        # This regex looks stupid but its the ## Content Name *duration* which is the header of each section (so wing x, eod strikes, soto strikes...)
+        pattern = r'(?=## [^*]+?\*[^*]+?\*)'
+        parts = re.split(pattern, flameoutput.stdout)
+
+        # Remove any empty strings (if the string starts with the pattern, for example)
+        wings = [part.strip() for part in parts if part.strip()]
         for wing in wings:
             try:
                 titles.append(wing.splitlines()[0])
@@ -321,7 +327,6 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
         titles = titles[1:]
         # Remove first line which is used as a title instead, this also catches runs with errors but is not robust. Need to talk to Lemon.
         #wings = ["\n".join(s.splitlines()[1:]) for s in wings]
-        wings = ["##" + s for s in wings]
         send_discord_embeds(webhook, wings, titles)
 
 def send_discord_embeds(webhook_url: str, contents: list[str], titles: list[str] = None, max_chars=6000):
