@@ -37,3 +37,6 @@ hooks.db
 gui_version/hooks.db
 *.db
 gui_version/*.db
+venv/
+Flame_Output.txt
+GW2-Flamebot-Extended/

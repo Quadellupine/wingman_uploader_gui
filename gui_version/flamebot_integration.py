@@ -45,7 +45,7 @@ def check_database():
         table_exists = cursor.fetchone()
         conn.close()
         if table_exists:
-            return True  
+            return True
         else:
             print(get_current_time(), "Database exists but hooks table is missing. The easiest way to resolve is to delete the DB.")
             return False 
