@@ -300,10 +300,10 @@ def run_flamebot(logs,flame_lang,flame_output_path, webhook, use_webhook):
     else:
         flameoutput = subprocess.run(["python3", "main.py"],cwd="GW2-Flamebot-Extended/GW2-Flamebot-Extended-main",capture_output=True,text=True)
     
-    outfile = flame_output_path+"/output.txt"
+    outfile = flame_output_path+"/output.md"
     with open(outfile, 'w', encoding='utf-8') as file:
         file.write(flameoutput.stdout)
-    print(get_current_time(), "Flamebot finished, check your output.txt at", flame_output_path)
+    print(get_current_time(), "Flamebot finished, check your output.md at", flame_output_path)
     if use_webhook:
         titles = []
         # This regex looks stupid but its the ## Content Name *duration* which is the header of each section (so wing x, eod strikes, soto strikes...)
